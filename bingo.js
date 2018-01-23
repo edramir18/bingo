@@ -48,7 +48,7 @@ function Bingo () {
         if (count.three <= 1 && count.two <= 4) {
           arr.push('322221111')
         }
-        console.log('arr:', arr.length)
+        console.log('arr: ', arr)
         fillRow(this, rowNumber, arr[random(arr.length)])
       }
       for (let i = 0; i < 9; i++) {
@@ -162,12 +162,14 @@ function Bingo () {
 const bingo = new Bingo()
 
 bingo.randomRow(0)
-console.log(bingo)
+console.log(bingo.rows)
 bingo.randomRow(1)
-console.log(bingo)
+console.log(bingo.rows)
 bingo.randomRow(2)
+console.log(bingo.rows)
 bingo.randomRow(3)
-console.log(bingo)
-/*bingo.randomRow(4)
-bingo.randomRow(5) */
-console.log(bingo)
+console.log(bingo.rows)
+bingo.randomRow(4)
+console.log(bingo.rows)
+bingo.randomRow(5)
+console.log(bingo.rows)
