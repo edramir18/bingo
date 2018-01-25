@@ -27,14 +27,14 @@ function Bingo () {
     [0, 0, 0, 0, 0, 0]
   ]
   this.randomRow = function (rowNumber) {
-    const arr = ['222222111']
+    const arr = []
     const count = countDigit(this.rows[rowNumber])
     if (count.zero > 0) {
       if (count.three === 3 || count.one === 6) {
         fillRow(this, rowNumber, '333111111')
-      } else if (count.three === 2 && count.two > 0) {
+      } else if (count.two > 0 && (count.three === 2 || count.one === 5)) {
         fillRow(this, rowNumber, '332211111')
-      } else if (count.three === 1 && count.two > 2) {
+      } else if (count.two > 2 && (count.three === 1 || count.one === 4 )) {
         fillRow(this, rowNumber, '322221111')
       } else if (count.two > 4) {
         fillRow(this, rowNumber, '222222111')
@@ -47,6 +47,9 @@ function Bingo () {
         }
         if (count.three <= 1 && count.two <= 4) {
           arr.push('322221111')
+        }
+        if (count.three === 0 && count.one <= 3) {
+          arr.push('222222111')
         }
         console.log('arr: ', arr)
         fillRow(this, rowNumber, arr[random(arr.length)])
@@ -76,6 +79,15 @@ function Bingo () {
 
   function checkMiddleColumn (obj, col) {
     const count = countDigit(obj.columns[col])
+    if (count.zero > 0) {
+      if(count.three === 2 || count.one === 4) {
+        fillColumn(obj, col, '331111')
+      } else if (count.two >= 1 && (count.three === 1 || count.one === 3)) {
+        fillColumn(obj, col, '322111')
+      } else if (count.two >= 3) {
+        fillColumn(obj, col, '222211')
+      }
+    }
   }
 
   function checkLastColumn (obj) {
@@ -83,7 +95,7 @@ function Bingo () {
     if (count.zero > 0) {
       if (count.three === 2 || count.one === 3) {
         fillColumn(obj, 8, '332111')
-      } else if (count.three === 1 && count.two >= 2) {
+      } else if (count.two >= 2 && (count.three === 1 || count.one === 2)) {
         fillColumn(obj, 8, '322211')
       } else if (count.two >= 4) {
         fillColumn(obj, 8, '222221')
