@@ -41,7 +41,7 @@ const middle = permute('331111').concat(permute('322111')).concat(permute('22221
 const last = permute('332111').concat(permute('322211')).concat(permute('222221'))
 // console.timeEnd('permute')
 
-function generateSerie (index, serie) {
+function generateSerie (index, serie) {  
   let local = []
   switch (index) {
     case 0:
@@ -53,20 +53,44 @@ function generateSerie (index, serie) {
     default:
       local = middle.slice(0)
   }
-
-  let result = false
-  while (!result && local.length > 0) {
+  while (local.length > 0) {
     const test = local.splice(random(local.length), 1)[0]
-    console.log(serie.toString())
     serie.fillColumn(index, test.split(''))
-    if (serie.isValid(index)) {
-      if (index === 8) return true
-      result = generateSerie(index + 1, serie)
-    } else {
-      serie.cleanColumn(index)
+    if (serie.isValid(index) && (index === 8 || generateSerie(index + 1, serie))) {
+      return true
     }
+    serie.cleanColumn(index)
   }
-  return result
+  return false
+}
+
+function generateAnimatedSerie (serie) {
+  let cols = 0
+  let wheels = [first.slice(0)]
+  const id = setInterval(iterate, 100)
+
+  function iterate () {
+
+    const test = wheels[cols].splice(random(wheels[cols].length), 1)[0]    
+    serie.fillColumn(cols, test.split(''))
+    console.log(`Testing Column ${cols}:${test} ${serie.inlineArray()}`)
+    if (serie.isValid(cols)) {
+      if (cols === 8){
+        clearInterval(id)
+      } else {
+        if (cols < 7) {
+          wheels[++cols] = middle.slice(0)
+        } else {
+          wheels[++cols] = last.slice(0)
+        }
+      }
+    } else if (wheels[cols].length === 0){
+      serie.cleanColumn(cols)      
+      if (--cols < 0) {
+        clearInterval(id)
+      }
+    }
+  }  
 }
 
 function Serie () {
@@ -85,13 +109,16 @@ function Serie () {
     }
   }
   this.isValid = function (index) {
-    return !this.data.some((row, ri) => {
-      let sum = row.reduce((total, v) => {
-        return total + v
-      }, 0)
-      if ((sum + 8 - index) > 15) return true
-      return false
+    return this.data.every(row => {
+      let sum = row.reduce(sumRow, 0)
+      if ((sum + 8 - index) > 15) return false
+      return true
     })
+  }
+  this.inlineArray = function () {
+    return this.data.reduce((inline, actual) => {
+      return inline.concat(actual)
+    },[])
   }
   this.toString = function () {
     return this.data.reduce((arr, v) => {
@@ -100,8 +127,19 @@ function Serie () {
     }, [])
   }
 
+  function sumRow (total, actual) {
+    return total + actual
+  }
+
   init(this)
 }
-const serie = new Serie()
-generateSerie(0, serie)
-console.log(serie.toString())
+/* for (let i = 0; i < 100000; i++) {
+  const serie = new Serie()
+  if (generateSerie(0, serie)) {
+    console.log(`Serie ${i} correcta`)
+  } else {
+    console.log('Error Creating serie', serie.toString())
+    break
+  }
+} */
+generateAnimatedSerie(new Serie())
